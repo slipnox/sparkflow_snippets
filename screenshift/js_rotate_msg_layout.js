@@ -1,5 +1,5 @@
 var $document = $(document), //catch document
-    rotationTimeOut;
+    resizeTimeOut;
 
 // AdChoices Icon
 $.ajax({
@@ -46,7 +46,7 @@ function setRotateMsg(e) {
     function adResizeAction() {
         // wait to hide the rotate cover on user close action or hide inmediately on device rotation interacion
         if (mraid.getState() === 'default') {
-            rotationTimeOut = setTimeout(function () {
+            resizeTimeOut = setTimeout(function () {
                 rotateMsg.removeClass('active');
             }, 50);
         } else if (isPortrait) {
@@ -68,7 +68,7 @@ $document
         addRotateMsg(); //insert rotate message
         $.getScript('//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js', ssInit);
     }).on('adResize', function (e) {
-        clearTimeout(rotationTimeOut);
+        clearTimeout(resizeTimeOut);
         setRotateMsg(); //set rotate message on resizing
     });
 
