@@ -36,30 +36,29 @@ function insertAdBranding() {
 }
 
 function insertRotateMsg() {
-    var widthFixer = $('#widthFixer'),
-        rotateContainer = $('<div></div>', { id: 'msg_landscape' }),
+    var rotateContainer = $('<div></div>', { class: 'msg_landscape' }),
         closeRotateMsg = $('<div></div>', { class: 'rotate_close_btn' }),
         messageContainer = $('<div></div>', { class: 'msg_container' }),
         spiningDevice = $('<div></div>', { class: 'spinner' }),
         box = $('<div></div>', { class: 'box' }).appendTo(spiningDevice),
         dot = $('<div></div>', { class: 'dot' }).appendTo(spiningDevice),
-        rMessageTxt = $('<p>', { id: 'rotate_txt', text: 'Please rotate your device.' }), // change text if is needed
-        campaignOwnerLogo = $('<img />', { id: 'rotate_logo', src: 'rotate_logo.png' }); // change src if is needed
+        rMessageTxt = $('<p>', { class: 'rotate_txt', text: 'Please rotate your device.' }), // change text if is needed
+        campaignOwnerLogo = $('<img />', { class: 'rotate_logo', src: 'rotate_logo.png' }); // change src if is needed
+
+    //append message content
+    messageContainer.append(campaignOwnerLogo, rMessageTxt, spiningDevice);
+    rotateContainer.append(messageContainer, closeRotateMsg).appendTo($ssDocument.find('body'));
 
     //add interaction listener to the close btn
     closeRotateMsg.on('click', function(e) {
         mraid.close();
     });
-
-    //append message content
-    messageContainer.append([campaignOwnerLogo, rMessageTxt, spiningDevice]);
-    rotateContainer.append([messageContainer, closeRotateMsg]).appendTo(widthFixer);
 }
 
 function setRotateMsg(e) {
     var isPortrait = device.mobile() && $(window).width() < 480,
         isResizedVisible = $('.banner.smartphone').is(':hidden') && $('.resized.smartphone').is(':visible'),
-        rotateMsg = $('#msg_landscape');
+        rotateMsg = $('.msg_landscape');
 
     !isPortrait && isResizedVisible ? rotateMsg.addClass('active') : adResizeAction();
 
