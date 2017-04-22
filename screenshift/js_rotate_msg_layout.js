@@ -1,46 +1,53 @@
-var $document = $(document), //catch document
+//global level variables
+var $ssDocument = $(document),
+    isIE = /(MSIE|Trident\/|Edge\/)/i.test(navigator.userAgent), //check for internet explorer or edge
     resizeTimeOut;
 
-// AdChoices Icon
-$.ajax({
-    url: "/sparkflow/formats/latest/adchoices.min.js",
-    dataType: "script",
-    cache: true,
-    success: function () {
-        AdChoices.init({
-            corner: "br",
-            //icon: true,
-            url: "http://www.undertone.com/opt-out-tool?utm_source=AdChoiceIcon&utm_medium=IAAdChoicesIcon&utm_campaign=Privacy"
-        });
-    }
-});
+//preload assets
+$(function() {
+    var preloadAssets = [ //add any assets to be preloaded to this array
+        '//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js',
+        '//cdnjs.cloudflare.com/ajax/libs/device.js/0.2.7/device.min.js',
+        "/sparkflow/formats/latest/adchoices.min.js",
+        "/sparkflow/formats/latest/utmark.min.js",
+        "rotate_logo.png",
+        "closeBtn.png",
+    ];
 
-//preload scripts
-$(function () {
-    if (isIEorEdge()) {
-        ad.preload([
-            '//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js',
-            '//cdnjs.cloudflare.com/ajax/libs/device.js/0.2.7/device.min.js'
-        ]);
-    } else {
+    if (!isIE) { //for some reason external js assets must be loaded with jQuery if is not IE in order to works
         $.getScript('//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js');
-        $.getScript('//cdnjs.cloudflare.com/ajax/libs/device.js/0.2.7/device.min.js')
+        $.getScript('//cdnjs.cloudflare.com/ajax/libs/device.js/0.2.7/device.min.js');
     }
+
+    ad.preload(preloadAssets);
 });
 
-function addRotateMsg() {
-    var widthFixer        = $('#widthFixer'),
-        rotateContainer   = $('<div></div>', { id:    'msg_landscape' }),
-        closeRotateMsg    = $('<div></div>', { class: 'rotate_close_btn' }),
-        messageContainer  = $('<div></div>', { class: 'msg_container' }),
-        spiningDevice     = $('<div></div>', { class: 'spinner'}),
-        box               = $('<div></div>', { class: 'box'}).appendTo(spiningDevice),
-        dot               = $('<div></div>', { class: 'dot'}).appendTo(spiningDevice),
-        rMessageTxt       = $('<p>', { id:            'rotate_txt', text: 'Please rotate your device.' }), // change text if is needed
+function insertAdBranding() {
+    AdChoices.init({ //AdChoices
+        corner: "br", // corner property which where the icon will be anchored: tr, tl, br or bl
+        url: "http://www.undertone.com/opt-out-tool?utm_source=AdChoiceIcon&utm_medium=IAAdChoicesIcon&utm_campaign=Privacy"
+    });
+
+    UndertoneMark.init({ //Undertone
+        corner: "bl", // corner property which where the icon will be anchored: tr, tl, br or bl
+        color: 'black',
+        opacity: 0.5,
+    });
+}
+
+function insertRotateMsg() {
+    var widthFixer = $('#widthFixer'),
+        rotateContainer = $('<div></div>', { id: 'msg_landscape' }),
+        closeRotateMsg = $('<div></div>', { class: 'rotate_close_btn' }),
+        messageContainer = $('<div></div>', { class: 'msg_container' }),
+        spiningDevice = $('<div></div>', { class: 'spinner' }),
+        box = $('<div></div>', { class: 'box' }).appendTo(spiningDevice),
+        dot = $('<div></div>', { class: 'dot' }).appendTo(spiningDevice),
+        rMessageTxt = $('<p>', { id: 'rotate_txt', text: 'Please rotate your device.' }), // change text if is needed
         campaignOwnerLogo = $('<img />', { id: 'rotate_logo', src: 'rotate_logo.png' }); // change src if is needed
 
     //add interaction listener to the close btn
-    closeRotateMsg.on('click', function (e) {
+    closeRotateMsg.on('click', function(e) {
         mraid.close();
     });
 
@@ -59,7 +66,7 @@ function setRotateMsg(e) {
     function adResizeAction() {
         // wait to hide the rotate cover on user close action or hide inmediately on device rotation interacion
         if (mraid.getState() === 'default') {
-            resizeTimeOut = setTimeout(function () {
+            resizeTimeOut = setTimeout(function() {
                 rotateMsg.removeClass('active');
             }, 50);
         } else if (isPortrait) {
@@ -68,45 +75,20 @@ function setRotateMsg(e) {
     }
 }
 
-function isIEorEdge() {
-    var ua = window.navigator.userAgent;
-
-    var msie = ua.indexOf('MSIE ');
-    if (msie > 0) {
-        // IE 10 or older => return version number
-        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-    }
-
-    var trident = ua.indexOf('Trident/');
-    if (trident > 0) {
-        // IE 11 => return version number
-        var rv = ua.indexOf('rv:');
-        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-    }
-
-    var edge = ua.indexOf('Edge/');
-    if (edge > 0) {
-        // Edge (IE 12+) => return version number
-        return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-    }
-
-    // other browser
-    return false;
-}
-
 function ssInit() {
     //ss animation here
 }
 
-$document
-    .on('adInteraction', function () { // If an interaction is detected clear the auto close
+$ssDocument
+    .on('adInteraction', function() { // If an interaction is detected clear the auto close
         mraid.cancelAutoClose();
-    }).on('adReady adClick', function () { // Wait for the adReady or adClick event to initialize
+    }).on('adReady adClick', function() { // Wait for the adReady or adClick event to initialize
         mraid.setAutoClose(15 * 1000);
-    }).on('adReady', function () {
-        addRotateMsg(); //insert rotate message
-        $.getScript('//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js', ssInit);
-    }).on('adResize', function (e) {
+    }).on('adReady', function() {
+        insertAdBranding();
+        insertRotateMsg();
+        ssInit(); //start screenshit
+    }).on('adResize', function(e) {
         clearTimeout(resizeTimeOut);
         setRotateMsg(); //set rotate message on resizing
     });
