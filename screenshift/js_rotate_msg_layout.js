@@ -1,4 +1,4 @@
-//global level variables
+//global variables
 var $ssDocument = $(document),
     isIE = /(MSIE|Trident\/|Edge\/)/i.test(navigator.userAgent), //check for internet explorer or edge
     resizeTimeOut;
@@ -55,23 +55,31 @@ function insertRotateMsg() {
     });
 }
 
-function setRotateMsg(e) {
-    var isPortrait = device.mobile() && $(window).width() < 480,
-        isResizedVisible = $('.banner.smartphone').is(':hidden') && $('.resized.smartphone').is(':visible'),
-        rotateMsg = $('.msg_landscape');
+function setRotateMsg(e, onExpandCb, onCloseCb) {
+    var resized = $ssDocument.find('.resized'),
+        banner = $ssDocument.find('.banner'),
+        rotateMsg = $ssDocument.find('.msg_landscape'),
+        isExpanded = resized.is(':visible') && banner.is(':hidden'),
+        isMobilePortrait = device.mobile() && $(window).width() < 480,
+        isMobileResized = $ssDocument.find('.resized.smartphone').is(':visible');
 
-    !isPortrait && isResizedVisible ? rotateMsg.addClass('active') : adResizeAction();
+    !isMobilePortrait && isMobileResized ? rotateMsg.addClass('active') : adResizeAction();
 
+    // wait to hide the rotate cover on user close action or hide inmediately on device rotation interacion
     function adResizeAction() {
-        // wait to hide the rotate cover on user close action or hide inmediately on device rotation interacion
-        if (mraid.getState() === 'default') {
+        if (isMobilePortrait) {
+            rotateMsg.removeClass('active');
+        } else {
             resizeTimeOut = setTimeout(function() {
                 rotateMsg.removeClass('active');
-            }, 50);
-        } else if (isPortrait) {
-            rotateMsg.removeClass('active');
+            }, 40);
         }
     }
+
+    clearTimeout($.data(this, 'resizeTimer'));
+    $.data(this, 'resizeTimer', setTimeout(function() {
+        onExpandCb || onCloseCb ? isExpanded ? onExpandCb() : onCloseCb() : false;
+    }, 200));
 }
 
 function ssInit() {
@@ -88,6 +96,10 @@ $ssDocument
         insertRotateMsg();
         ssInit(); //start screenshit
     }).on('adResize', function(e) {
-        clearTimeout(resizeTimeOut);
-        setRotateMsg(); //set rotate message on resizing
+        clearTimeout(resizeTimeOut); //
+        setRotateMsg(e, function() { //set rotate message on resizing
+            // console.log('expanded');
+        }, function() {
+            // console.log('closed');
+        });
     });
