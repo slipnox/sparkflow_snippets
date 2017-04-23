@@ -2,12 +2,16 @@ section {
     bottom: auto !important;
 }
 
+
 /** screenshift styles **/
+
 
 /** screenshift styles ENDs **/
 
+
 /** rotate message **/
-#msg_landscape {
+
+.msg_landscape {
     display: none;
     top: 0;
     left: 0;
@@ -17,11 +21,11 @@ section {
     background: black;
 }
 
-.mobile #msg_landscape.ecl.active {
+.mobile .msg_landscape.active {
     display: block;
 }
 
-#msg_landscape .rotate_close_btn {
+.msg_landscape .rotate_close_btn {
     background-image: url(closeBtn.png);
     background-repeat: no-repeat;
     background-position: center center;
@@ -46,12 +50,12 @@ section {
     transform: translate(-50%, -50%);
 }
 
-#rotate_logo {
+.rotate_logo {
     width: 150px;
     display: inline-block;
 }
 
-#rotate_txt {
+.rotate_txt {
     font-family: Helvetica, Arial, sans-serif;
 }
 
@@ -101,10 +105,14 @@ section {
     }
 }
 
+
 /*iphone 5s rotate msg fix*/
+
 @media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (orientation: landscape) {
     .msg_container {
         top: 45%;
     }
 }
+
+
 /** rotate message ENDs **/
